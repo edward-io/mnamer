@@ -101,12 +101,15 @@ mnamer --batch --recurse \
   --link=hardlink \
   --movie-directory=movies \
   --episode-directory=tvs \
+  --no-overwrite \
   --movie-format="{name} ({year})/{name} ({year}).{extension}" \
   --episode-format="{series}/Season {season:02}/{series} - S{season:02}E{episode:02} - {title}.{extension}" \
   /path/to/your/media/root
 ```
 
 This will produce `movies/Movie Title (Year)/Movie Title (Year).ext` for movies and `tvs/Show Name/Season 01/Show Name - S01E01 - Episode.ext` for TV episodes.
+
+You'll need to use a separate command to watch your folder for updates (e.g. fswatch, systemd.path, etc).
 
 ## Contributions
 

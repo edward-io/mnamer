@@ -1,7 +1,7 @@
 {
   "[python]": {
     "editor.codeActionsOnSave": {
-      "python.sortImports": true
+      "python.sortImports": "explicit"
     },
     "editor.formatOnSave": true
   },
