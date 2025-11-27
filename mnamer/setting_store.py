@@ -10,7 +10,7 @@ from mnamer.exceptions import MnamerException
 from mnamer.language import Language
 from mnamer.metadata import Metadata
 from mnamer.setting_spec import SettingSpec
-from mnamer.types import MediaType, ProviderType, SettingType
+from mnamer.types import MediaType, ProviderType, RelocationMethod, SettingType
 from mnamer.utils import crawl_out, json_loads, normalize_containers
 
 
@@ -152,6 +152,15 @@ class SettingStore:
             flags=["--no_style", "--no-style", "--nostyle"],
             group=SettingType.PARAMETER,
             help="--no-style: print to stdout without using colour or unicode chars",
+        ).as_dict(),
+    )
+    link: RelocationMethod = dataclasses.field(
+        default=RelocationMethod.MOVE,
+        metadata=SettingSpec(
+            choices=[method.value for method in RelocationMethod],
+            flags=["--link"],
+            group=SettingType.PARAMETER,
+            help="--link={*move,hardlink,symlink}: choose relocation behaviour",
         ).as_dict(),
     )
     movie_api: ProviderType | str = dataclasses.field(
@@ -373,6 +382,7 @@ class SettingStore:
             "episode_api": ProviderType,
             "episode_directory": self._resolve_path,
             "language": Language.parse,
+            "link": RelocationMethod,
             "mask": normalize_containers,
             "media": MediaType,
             "movie_api": ProviderType,

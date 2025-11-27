@@ -11,7 +11,7 @@ from mnamer.exceptions import (
 )
 from mnamer.setting_store import SettingStore
 from mnamer.target import Target
-from mnamer.types import MessageType
+from mnamer.types import MessageType, RelocationMethod
 from mnamer.utils import clear_cache, get_filesize, is_subtitle
 
 
@@ -148,7 +148,7 @@ class Cli(Frontend):
                 tty.msg("skipping (--no-overwrite)", MessageType.ALERT)
                 continue
 
-            self._rename_and_move_file(target)
+            self._relocate_file(target)
 
     def _announce_file(self, target: Target):
         media_type = target.metadata.to_media_type().value.title()
@@ -171,9 +171,15 @@ class Cli(Frontend):
         tty.msg(target.metadata.as_dict(), debug=True)
         tty.msg("", debug=True)
 
-    def _rename_and_move_file(self, target: Target):
+    def _relocate_file(self, target: Target):
+        verbs = {
+            RelocationMethod.MOVE: "moving to",
+            RelocationMethod.HARDLINK: "hardlinking to",
+            RelocationMethod.SYMLINK: "symlinking to",
+        }
+        verb = verbs.get(self.settings.link, "moving to")
         tty.msg(
-            f"moving to {target.destination.absolute()}",
+            f"{verb} {target.destination.absolute()}",
             MessageType.SUCCESS,
         )
         if self.settings.test:

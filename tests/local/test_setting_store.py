@@ -1,7 +1,7 @@
 import pytest
 
 from mnamer.setting_store import SettingStore
-from mnamer.types import MediaType, ProviderType
+from mnamer.types import MediaType, ProviderType, RelocationMethod
 from tests import DEFAULT_SETTINGS
 
 pytestmark = pytest.mark.local
@@ -29,3 +29,8 @@ def test_api_key_for(api: ProviderType):
     settings = SettingStore()
     setattr(settings, f"api_key_{api.value}", "xxx")
     assert settings.api_key_for(api) == "xxx"
+
+
+def test_link__string_conversion():
+    settings = SettingStore(link="symlink")
+    assert settings.link is RelocationMethod.SYMLINK

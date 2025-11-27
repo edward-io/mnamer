@@ -6,7 +6,7 @@ import pytest
 from mnamer.metadata import MetadataEpisode, MetadataMovie
 from mnamer.setting_store import SettingStore
 from mnamer.target import Target
-from mnamer.types import MediaType
+from mnamer.types import MediaType, RelocationMethod
 
 pytestmark = pytest.mark.local
 
@@ -121,3 +121,41 @@ def test_query():
 
 def test_relocate():
     pass  # TODO
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocate__move(setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    target = Target(Path("aladdin.2019.avi"), SettingStore(media=MediaType.MOVIE))
+    destination = Path(target.destination).resolve()
+    target.relocate()
+    assert destination.exists()
+    assert not target.source.exists()
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocate__hardlink(setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    target = Target(
+        Path("aladdin.2019.avi"),
+        SettingStore(media=MediaType.MOVIE, link=RelocationMethod.HARDLINK),
+    )
+    destination = Path(target.destination).resolve()
+    target.relocate()
+    assert destination.exists()
+    assert target.source.exists()
+    assert target.source.stat().st_ino == destination.stat().st_ino
+
+
+@pytest.mark.usefixtures("setup_test_dir")
+def test_relocate__symlink(setup_test_files):
+    setup_test_files("aladdin.2019.avi")
+    target = Target(
+        Path("aladdin.2019.avi"),
+        SettingStore(media=MediaType.MOVIE, link=RelocationMethod.SYMLINK),
+    )
+    destination = Path(target.destination).absolute()
+    target.relocate()
+    assert destination.is_symlink()
+    assert destination.resolve() == target.source.resolve()
+    assert target.source.exists()

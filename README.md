@@ -1,3 +1,6 @@
+To use this repo, `git clone` and `uv pip install -e .`
+
+
 [![PyPI](https://img.shields.io/pypi/v/mnamer.svg?style=for-the-badge)](https://pypi.python.org/pypi/mnamer)
 [![Tests](https://img.shields.io/github/actions/workflow/status/jkwill87/mnamer/.github/workflows/push.yml?branch=main&style=for-the-badge&label=Tests)](https://github.com/jkwill87/mnamer/actions/workflows/push.yml?query=branch:main)
 [![Coverage](https://img.shields.io/codecov/c/github/jkwill87/mnamer/main.svg?style=for-the-badge)](https://codecov.io/gh/jkwill87/mnamer)
@@ -58,6 +61,7 @@ PARAMETERS:
   --ignore=<PATTERN,...>: ignore files matching these regular expressions
   --language=<LANG>: specify the search language
   --mask=<EXTENSION,...>: only process given file types
+  --link={*move,hardlink,symlink}: choose relocation behaviour (move files, create hardlinks, or symlinks)
   --no-guess: disable best guess; e.g. when no matches or network down
   --no-overwrite: prevent relocation if it would overwrite a file
   --no-style: print to stdout without using colour or unicode chars
@@ -87,6 +91,22 @@ DIRECTIVES:
 ```
 
 Parameters can either by entered as command line arguments or from a config file named `.mnamer-v2.json`.
+
+## Quickstart for Jellyfin users
+
+Hardlink your existing media into Jellyfin-friendly folders without moving the originals:
+
+```
+mnamer --batch --recurse \
+  --link=hardlink \
+  --movie-directory=movies \
+  --episode-directory=tvs \
+  --movie-format="{name} ({year})/{name} ({year}).{extension}" \
+  --episode-format="{series}/Season {season:02}/{series} - S{season:02}E{episode:02} - {title}.{extension}" \
+  /path/to/your/media/root
+```
+
+This will produce `movies/Movie Title (Year)/Movie Title (Year).ext` for movies and `tvs/Show Name/Season 01/Show Name - S01E01 - Episode.ext` for TV episodes.
 
 ## Contributions
 

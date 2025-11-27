@@ -13,7 +13,7 @@ from mnamer.language import Language
 from mnamer.metadata import Metadata, MetadataEpisode, MetadataMovie
 from mnamer.providers import Provider
 from mnamer.setting_store import SettingStore
-from mnamer.types import MediaType, ProviderType
+from mnamer.types import MediaType, ProviderType, RelocationMethod
 from mnamer.utils import (
     crawl_in,
     filename_replace,
@@ -239,10 +239,16 @@ class Target:
         return response
 
     def relocate(self) -> None:
-        """Performs the action of renaming and/or moving a file."""
+        """Performs the action of relocating a file via move or link."""
         destination_path = Path(self.destination).resolve()
         destination_path.parent.mkdir(parents=True, exist_ok=True)
+        source_path = self.source.resolve()
         try:
-            move(str(self.source), destination_path)
+            if self._settings.link is RelocationMethod.HARDLINK:
+                destination_path.hardlink_to(source_path)
+            elif self._settings.link is RelocationMethod.SYMLINK:
+                destination_path.symlink_to(source_path)
+            else:
+                move(str(self.source), destination_path)
         except OSError as e:  # pragma: no cover
             raise MnamerException from e
