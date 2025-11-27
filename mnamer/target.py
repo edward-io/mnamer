@@ -79,6 +79,21 @@ class Target:
         else:
             return target._settings.media is target.metadata.to_media_type()
 
+    @staticmethod
+    def _merge_guessit_data(
+        primary: dict[str, Any], secondary: dict[str, Any]
+    ) -> dict[str, Any]:
+        merged = dict(primary)
+        for key, value in secondary.items():
+            if value is None:
+                continue
+            if key not in merged or merged[key] is None:
+                merged[key] = value
+                continue
+            if isinstance(merged[key], list) and not isinstance(value, list):
+                merged[key] = value
+        return merged
+
     @property
     def provider_type(self) -> ProviderType:
         provider_type = self._settings.api_for(self.metadata.to_media_type())
@@ -125,7 +140,9 @@ class Target:
         options = {"type": self._settings.media, "language": path_data["language"]}
         raw_data = dict(guessit(str(file_path), options))
         if isinstance(raw_data.get("season"), list):
-            raw_data = dict(guessit(str(file_path.parts[-1]), options))
+            raw_data = self._merge_guessit_data(
+                raw_data, dict(guessit(str(file_path.name), options))
+            )
         for k, v in raw_data.items():
             if hasattr(v, "alpha3"):
                 try:

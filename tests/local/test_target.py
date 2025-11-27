@@ -67,6 +67,17 @@ def test_parse__series():
     assert target.metadata.series == "Ninja Turtles"
 
 
+def test_parse__uses_full_path_for_series_when_season_range_present():
+    file_path = Path(
+        "tv/Stranger.Things.S01-S04.MULTI.2160p.WEB-DL.SDR.H265-AOC/S01/S01E01.mkv"
+    )
+    target = Target(file_path, SettingStore())
+    assert isinstance(target.metadata, MetadataEpisode)
+    assert target.metadata.series == "Stranger Things"
+    assert target.metadata.season == 1
+    assert target.metadata.episode == 1
+
+
 def test_parse__year():
     file_path = Path("the.goonies.1985")
     target = Target(file_path, SettingStore())
